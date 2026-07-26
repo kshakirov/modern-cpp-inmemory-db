@@ -1,6 +1,7 @@
-using namespace std;
 #include <iostream>
-#include <vector>
+#include "all.hpp"
+#include "../lib/rel_operator/rel_operator.hpp"
+
 
 
 //import std;
@@ -10,6 +11,9 @@ using namespace std;
 
 int main(int argc, char** argv){
   cout<< "Emulating our rel engine"<< endl;
+  cout<<""<<endl;
+  Filter(3);
+  
   
 
 
