@@ -12,7 +12,7 @@ int main(int argc, char** argv){
   LatticeStorage storage;
   storage.id =1;
   
-  Filter(3);
+  Filter(&storage, 3);
   dump(&storage);
   
 

@@ -1,1 +1,2 @@
-void Filter(int x);
+#include "../all_types.hpp"
+void Filter(LatticeStorage* storage, int x);
