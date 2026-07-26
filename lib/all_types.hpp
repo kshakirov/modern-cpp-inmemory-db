@@ -1,0 +1,4 @@
+struct LatticeStorage {
+  int id;
+
+};
