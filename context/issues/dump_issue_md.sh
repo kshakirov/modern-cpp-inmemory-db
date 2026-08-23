@@ -1,5 +1,5 @@
 gh issue view $1 \
-  --repo kshakirov/mkm1-mentat \
+   --repo kshakirov/modern-cpp-inmemory-db \
   --json number,title,state,author,createdAt,updatedAt,url,body,comments \
   --template '{{printf "# Issue #%v — %s\n\n" .number .title}}
 **State:** {{.state}}

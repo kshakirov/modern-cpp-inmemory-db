@@ -1,75 +1,30 @@
-# Issue #2 — ТЕЗИС: ИЕРАРХИЧЕСКАЯ РЕДУКЦИЯ БЕСКОНЕЧНОМЕРНЫХ ГИЛЬБЕРТОВЫХ ПРОСТРАНСТВ (THE HIERARCHICAL COMPACTNESS PRINCIPLE)
+# Issue #2 — Designing a Vectorized Lazy Query Operator via C++20 Coroutines
 
 
 **State:** OPEN
 **Author:** @kshakirov
-**Created:** 2026-08-15T20:57:19Z
-**Updated:** 2026-08-16T05:50:37Z
-**URL:** https://github.com/kshakirov/mkm1-mentat/issues/2
+**Created:** 2026-08-02T15:16:28Z
+**Updated:** 2026-08-02T15:16:28Z
+**URL:** https://github.com/kshakirov/modern-cpp-inmemory-db/issues/2
 
 ---
 
+### Issue #2: Designing a Vectorized Lazy Query Operator via C++20 Coroutines
 
+#### 1. Mathematical & Theoretical Foundation
+* Implement a relational selection operator ($\sigma_{predicate}$) as a lazy evaluation stream.
+* Ensure the operator is orthogonal to the underlying storage type.
 
-# [TICKET-004] ТЕЗИС: ИЕРАРХИЧЕСКАЯ РЕДУКЦИЯ БЕСКОНЕЧНОМЕРНЫХ ГИЛЬБЕРТОВЫХ ПРОСТРАНСТВ (THE HIERARCHICAL COMPACTNESS PRINCIPLE)
+#### 2. Hardware-Driven Constraints (Cache-Locality)
+* Avoid the Volcano model (tuple-at-a-time) to prevent instruction cache misses.
+* Avoid full realization to prevent out-of-memory errors on large datasets.
+* Pass data chunks between operators inside the L1/L2 cache boundaries.
 
-## 1. ПОСТАНОВКА ПРОБЛЕМЫ (PROBLEM STATEMENT)
+#### 3. C++ Modern Architecture Design
+* Use **`std::generator`** (C++23) to build a lazy, suspendable pipeline.
+* Make the coroutine yield a **`std::vector<size_t>`** containing a batch (chunk) of filtered indices.
+* Enforce **Move Semantics (`std::move`)** to transfer index chunks out of the coroutine without copying memory.
 
-Классическая формализация гильбертовых пространств $L^2$ в учебниках рассматривает бесконечномерные базисы как набор «равноправных» осей ортогональной системы координат. При попытке вычислить спектр или собственные значения бесконечной матрицы $A \in \mathbb{C}^{\infty \times \infty}$ возникают фундаментальные противоречия:
-
-1. Вычисление спектра бесконечной матрицы алгебраически невозможно за конечное число шагов.
-2. Проекция на конечномерное подпространство $P_N A P_N$ в наивной дискретизации создаёт риски спектрального искажения (псевдоспектры) и потери устойчивости.
-
-## 2. ГИПОТЕЗА / ТЕЗИС (CORE THESIS)
-
-Бесконечномерное гильбертово пространство физически реализуемых сигналов $L^2(D)$ и ограниченных операторов над ними является **не «равноправно-бесконечным», а бесконечно вложенным (иерархически сжатым)**.
-
-Каждая последующая размерность базиса $\{e_n\}_{n=1}^\infty$ обладает масштабом (энергетической весовой мерой), нелинейно убывающим по отношению к предыдущей:
-
-
-$$\Vert{}c_n e_n\Vert{} \le \mathcal{O}(n^{-k}) \quad \text{или} \quad \mathcal{O}(e^{-\alpha n}), \quad \alpha > 0, \, k > 1$$
-
-## 3. МАТЕМАТИЧЕСКОЕ ДОКАЗАТЕЛЬСТВО И СВОЙСТВА (MATHEMATICAL PROOF)
-
-1. **Компактность и Сходимость (Теорема о «хвосте»):**
-По условию принадлежности функции $f \in L^2$, ряд Парсеваля сходится:
-
-$$\sum_{n=1}^\infty \vert{}c_n\vert{}^2 = \Vert{}f\Vert{}_{L^2}^2 < \infty \implies \lim_{N \to \infty} \sum_{n=N+1}^\infty \vert{}c_n\vert{}^2 = 0$$
-
-
-
-Следовательно, бесконечный остаток вектора («хвост») всегда принадлежит компактной $\varepsilon$-окрестности нуля: $R_N(f) \in B_\varepsilon(0)$.
-2. **Нелинейное сжатие операторов:**
-Для любого физически реализуемого (компактного) оператора $A$ его собственные числа $\{\lambda_n\}$ образуют бесконечно убывающую последовательность с единственной точкой предела в нуле:
-
-$$\lim_{n \to \infty} \lambda_n = 0$$
-
-
-
-Матрица оператора $A_{ij} = \langle A e_j, e_i \rangle$ обладает свойством быстрого затухания внедиагональных элементов при $\vert{}i - j\vert{} \to \infty$.
-3. **Гарантия точности редукции (Bounded Approximation Property):**
-Существует гарантированный порог truncation level $N(\varepsilon)$, такой что ошибка проекции оператора на $N$-мерное подпространство строго ограничена заданным допуском $\varepsilon$:
-
-$$\Vert{}A - P_N A P_N\Vert{}_{\mathcal{B}(H)} \le \varepsilon$$
-
-
-
-## 4. ПРОГРАММНО-АППАРАТНАЯ РЕАЛИЗАЦИЯ (COMPILER CONTRACTS)
-
-На уровне компилятора (`mkm1-compiler` / Idris 2 / C99) поиск спектра перестаёт быть работой с «бесконечной матрицей» и превращается в **алгоритм адаптивного сжатия**:
-
-1. **Динамический отсекатель (Truncation Boundary):**
-Значение $N$ выбирается автоматически исходя из разрядной сетки процессора (например, для 16-битной фиксированной точки `Q15` порог отсечения устанавливается там, где $\vert{}c_n\vert{} < 2^{-15}$).
-2. **Контракт отсечения шума:**
-Все размерности $n > N$ признаются математически принадлежащими подпространству шума квантования и не задействуют память и такты MCU.
-3. **Защита от псевдоспектра:**
-Оператор $A$ проецируется только в собственном (или квазисобственном) иерархическом базисе, что делает конечную матрицу $A_N$ диагонально-доминирующей и исключает вылет `Fixed-Point` регистров за пределы $[-1, +1)$.
-
----
-
-Тезис сформулирован и готов к сохранению в твои источники!
-
-Как сохранишь — дай знать, и мы перейдем к следующему шагу про спектр такого пространства!
 
 ---
 
