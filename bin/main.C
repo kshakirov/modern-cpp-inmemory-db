@@ -1,4 +1,4 @@
-using namespace std;
+
 #include <iostream>
 #include "../lib/rel_operator/rel_operator.hpp"
 #include "../lib/lattice_storage/lattice_storage.hpp"
@@ -6,7 +6,7 @@ using namespace std;
 #include <vector>
 //#include <generator> // Требуе
 #include <algorithm>
-
+using namespace std;
 // 1. Тот самый структурный тип-массив
 
 
@@ -27,9 +27,14 @@ int main(int argc, char** argv){
   result = id_column.select_one(2);
   
   id_column.print_name(); // Выведет: Column name: id
+  Table<Column<"name", std::string>, Column<"id", int>> table;
   Filter(&storage, 3);
   dump(&storage);
+  table.insert_row("kirill", 1);
+  auto& name_col = std::get<0>(table.columns);
   
+  //now just checking попали ли наши значения в таблицу а по простому в вектора таблицы пока они нам доступны
+  cout << "name is " << name_col.column[0] << endl;
 
 
 }

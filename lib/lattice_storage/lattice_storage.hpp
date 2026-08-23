@@ -1,5 +1,6 @@
 #include "../all_types.hpp"
 #include <algorithm>
+#include <tuple>
 #include <vector>
 #include <optional>
 
@@ -34,7 +35,21 @@ struct Column {
       return  std::nullopt;
     }
   }
- 
+    
+};
+
+
+
+template<typename... Cols>
+struct Table {
+  std::tuple<Cols...> columns;
+
+  template<typename... Args>
+  void insert_row(Args&&... args) {
+    std::apply([&](auto&... cols) {
+      ((cols.insert(std::forward<Args>(args))), ...);
+    }, columns);
+  }
 };
 
 
