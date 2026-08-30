@@ -39,11 +39,21 @@ struct Column {
 };
 
 
+// template <FixedString TargetName, typename  T>
+// struct IsSameName {
+//   static constexpr bool value = false;
+// };
+
+// template <FixedString TargetName, typename T>
+// struct IsSameName <TargetName, Column<TargetName, T> >{
+//   static constexpr bool value = true;
+// };
+
 
 template<typename... Cols>
 struct Table {
   std::tuple<Cols...> columns;
-
+  
   template<typename... Args>
   void insert_row(Args&&... args) {
     std::apply([&](auto&... cols) {

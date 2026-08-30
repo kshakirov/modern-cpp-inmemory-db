@@ -9,3 +9,6 @@ all:
 
 coroutine:
 	$(GCC) test/test_coroutince.   -o test/coroutince $(FLAGS)
+
+test_template:
+	$(GCC) test/test_templates.C   -o test/test_templates $(FLAGS)	
