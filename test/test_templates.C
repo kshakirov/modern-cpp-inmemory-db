@@ -54,7 +54,7 @@ struct find_column_index{
 
 template <FixedString TargetName, size_t Index, typename T>
 struct find_column_index <TargetName, Index, Column<TargetName, T>> { 
-  static constexpr  size_t value=Index;
+  static constexpr  size_t value= IsSameName<TargetName, T>::value ? Index : -1;
 };
 
 
