@@ -45,16 +45,20 @@ struct IsSameName <TargetName, Column<TargetName, T> >{
 };
 
 
-
 template <FixedString TargetName, size_t Index, typename ...Cols>
-struct find_column_index{
-  static constexpr  size_t value=-1;
+struct find_column_index;
+
+template <FixedString TargetName, size_t Index, typename FirstCol, typename  ... RestCols>
+struct find_column_index<TargetName, Index, FirstCol, RestCols...>{
+  static constexpr  size_t value= IsSameName<TargetName, FirstCol>::value ?
+    Index :
+    find_column_index<TargetName, Index + 1, RestCols...>::value;
 };
 
 
-template <FixedString TargetName, size_t Index, typename T>
-struct find_column_index <TargetName, Index, Column<TargetName, T>> { 
-  static constexpr  size_t value= IsSameName<TargetName, T>::value ? Index : -1;
+template <FixedString TargetName, size_t Index>
+struct find_column_index <TargetName, Index> { 
+  static constexpr  size_t value= -1;
 };
 
 
@@ -67,5 +71,22 @@ int main(int argc, char ** argv){
   cout << "Are Equal Types "<< AreEqualTypes<int,int>::value <<endl;
   cout << "Are Names equalt "<< IsSameName<"Name", Column<"id", int>>::value << endl;
   cout << "Are Names equalt "<< IsSameName<"Name", Column<"Name", string>>::value << endl;
-  
+  using TestColumns = find_column_index<
+    "name",
+    0,
+    Column<"id", int>,
+    Column<"name", std::string>,
+    Column<"age", int>
+    >;
+
+  static_assert(TestColumns::value == 1);
+  static_assert(
+		find_column_index<
+		"missing",
+		0,
+		Column<"id", int>,
+		Column<"name", std::string>
+		>::value == static_cast<std::size_t>(-1)
+		);
+
 }
