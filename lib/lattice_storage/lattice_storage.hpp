@@ -3,7 +3,7 @@
 #include <tuple>
 #include <vector>
 #include <optional>
-
+#include <assert.h>
 template<std::size_t N>
 struct FixedString {
   char data[N]{}; // Открытый массив символов
@@ -27,7 +27,7 @@ struct Column {
     column.push_back(val);
     return  1;
   }
-  std::optional<T> select_one(const T val){
+  std::optional<T> select_one(const T& val){
     auto it =  std::find(column.begin(), column.end(), val);
     if (it != column.end()) {
       return *it;
@@ -50,6 +50,37 @@ struct Column {
 // };
 
 
+
+
+
+
+template <FixedString TargetName, typename  T>
+struct IsSameName {
+  static constexpr bool value = false;
+};
+
+template <FixedString TargetName, typename T>
+struct IsSameName <TargetName, Column<TargetName, T> >{
+  static constexpr bool value = true;
+};
+
+
+template <FixedString TargetName, size_t Index, typename ...Cols>
+struct find_column_index;
+
+template <FixedString TargetName, size_t Index, typename FirstCol, typename  ... RestCols>
+struct find_column_index<TargetName, Index, FirstCol, RestCols...>{
+  static constexpr  size_t value= IsSameName<TargetName, FirstCol>::value ?
+    Index :
+    find_column_index<TargetName, Index + 1, RestCols...>::value;
+};
+
+
+template <FixedString TargetName, size_t Index>
+struct find_column_index <TargetName, Index> { 
+  static constexpr  size_t value= -1;
+};
+
 template<typename... Cols>
 struct Table {
   std::tuple<Cols...> columns;
@@ -59,8 +90,28 @@ struct Table {
     std::apply([&](auto&... cols) {
       ((cols.insert(std::forward<Args>(args))), ...);
     }, columns);
-  }
-};
+
+  };
+  template<FixedString TargetName, typename  T>
+  size_t  get_index(const T& val){
+    constexpr auto value = find_column_index<TargetName, 0, Cols...>::value;
+    const auto& column = std::get<value>(columns);
+    const auto& col = column.column;
+    auto it = std::find(col.begin(), col.end(), val);
+    if(it == col.end()){
+      return -1;
+    }else{
+      return std::distance(col.begin(), it);
+    }
+    
+      
+    }
+    
+   
+    
+   
+};   
+  
 
 
 void dump(LatticeStorage* storage );
