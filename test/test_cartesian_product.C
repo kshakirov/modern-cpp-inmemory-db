@@ -1,4 +1,5 @@
 #include <iostream>
+#include <tuple>
 #include "../lib/lattice_storage/lattice_storage.hpp"
 //using namespace  std;
 
@@ -9,16 +10,14 @@ using std::endl;
 
 template <typename A, typename B, FixedString aname, FixedString bname>
 Table<Column< aname, A >,Column<bname, B>> Join(Table<Column< aname, A>> tablea, Table<Column<bname,B >> tableb){
-  auto colsa = tablea.columns;
-  auto colsb = tableb.columns;
-  auto cola = std::get<0>(colsa);
-  auto colb = std::get<0>(colsb);
-  auto vec =  cola.column;
+  auto& colsa = tablea.columns;
+  auto& colsb = tableb.columns;
+  auto& cola = std::get<0>(colsa);
+  auto& colb = std::get<0>(colsb);
+
   Table<Column<aname, A>,Column<bname, B> > table;
-  Column a = std::get<0>(table.columns);
-  a = cola;
-  Column b = std::get<1>(table.columns);
-  b = colb;
+
+  table.columns = std::tuple_cat(colsa,colsb);
   return  table;   
   
   
