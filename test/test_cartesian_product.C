@@ -36,8 +36,7 @@ Table<Column< aname, A >,Column<bname, B>> Join(Table<Column< aname, A>> tablea,
       vec_b.push_back(v2);
     }
   }
-  auto col_1 = std::make_tuple(vec_a);
-  auto col_2 = std::make_tuple(vec_b);
+
   //create new columns
   Column<aname, A> new_cola;
   Column<bname, B> new_colb;
