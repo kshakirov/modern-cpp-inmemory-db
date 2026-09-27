@@ -17,18 +17,13 @@ Table<Column< aname, A >,Column<bname, B>> Join(Table<Column< aname, A>> tablea,
 
   auto& cola = std::get<0>(colsa);
   auto& colb = std::get<0>(colsb);
-  std::cout << "size of cola is " << cola.column.size() << " size of colb is "<< colb.column.size()<< endl;
-  
-  constexpr size_t n = std::tuple_size_v<decltype(tablea.columns)>;  // 3
-  constexpr size_t n2 = std::tuple_size_v<decltype(tableb.columns)>;  // 3
-  
-  std::cout << "size of tablea tuple  is " << n  << " size of tableb is "<< n2<< endl;
+
   Table<Column<aname, A>,Column<bname, B> > table;
   //lets pretend we hava only one column per table get size of join table
-  size_t common_size = cola.column.size() > colb.column.size() * colb.column.size();
+
   //init 2 vectors of this size for each column
-  std::vector<A> vec_a(common_size);
-  std::vector<B> vec_b(common_size);
+  std::vector<A> vec_a;
+  std::vector<B> vec_b;
   
   for (auto v1: cola.column){
     for( auto v2: colb.column){
