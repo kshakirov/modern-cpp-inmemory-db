@@ -32,7 +32,7 @@ Table<Column<aname, Head> , Tail...> JoinC1(Table<Column<aname, Head>>table, Tai
   Column<aname, Head> new_head_column;
   new_head_column.column = cola.column;
   //std::get<index>(t.columns) = new_head;
-  return add_column(new_head_column, tt...);
+  return add_column(new_head_column, JoinC1(tt...));
     
 
   //  constexpr static int  counter = counter + 1;
