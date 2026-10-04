@@ -11,7 +11,7 @@ using std::endl;
 
 template <typename A, typename B, FixedString aname, FixedString bname>
 Table<Column< aname, A >,Column<bname, B>> Join(Table<Column< aname, A>> tablea, Table<Column<bname,B >> tableb){
-  //create copies of   on purpose
+  //create references on table columns
   auto& colsa = tablea.columns;
   auto& colsb = tableb.columns;
 
@@ -52,6 +52,34 @@ Table<Column< aname, A >,Column<bname, B>> Join(Table<Column< aname, A>> tablea,
   
   
 }
+
+template<typename ...Cols>
+Table< Cols...> JoinC1 (Table<Cols>...){
+}
+
+template<typename ...Cols, typename  Head, typename  ...Tail, FixedString aname>
+Table<Column<aname, Head> , Tail...> JoinC1(Table<Column<aname, Head>>table, Tail...){
+    auto& col = table.columns;
+    auto& cola = std::get<0>(col);
+    
+    Table<Column<aname, Head> , Tail...> t;
+    Column<aname, Head> new_head;
+    new_head.column = cola.column;
+    std::get<0>(t.columns) = new_head;
+    return t;
+    
+
+  //  constexpr static int  counter = counter + 1;
+}
+template <typename ...Cols,typename  ...Tail>
+Table<Cols...> JoinC1(Tail...){};
+
+template <typename ...Cols>
+Table<Cols...> JoinC1(){
+  
+}
+
+
 
 int main(void){
   cout<<"Trying to get Cartesian product to work" <<endl;

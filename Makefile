@@ -14,4 +14,4 @@ test_template:
 	$(GCC) test/test_templates.C   -o test/test_templates $(FLAGS)
 
 test_cartesian:
-	$(GCC) test/test_cartesian_product.C   -o test/test_cartesian_product $(FLAGS)	
+	$(GCC) test/test_cartesian_product_2.C   -o test/test_cartesian_product_2 $(FLAGS)	
