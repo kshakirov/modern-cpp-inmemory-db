@@ -9,20 +9,30 @@ using std::cout;
 using std::endl;
 
 
-template<typename ...Cols>
-Table< Cols...> JoinC1 (Table<Cols>...){
-}
+
+
+
+
+template <typename ...Cols, typename Head, FixedString aname>
+Table<Cols... > add_column(Column<aname, Head> column, Table<Cols...> table){
+
+  constexpr std::size_t tuple_size =    std::tuple_size_v<decltype(table.columns)>;
+  std::get<tuple_size>(table.columns) = column;
+  return table;
+
+};
 
 template<typename ...Cols, typename  Head, typename  ...Tail, FixedString aname, int index>
+
 Table<Column<aname, Head> , Tail...> JoinC1(Table<Column<aname, Head>>table, Tail... tt  ){
   auto& col = table.columns;
-    auto& cola = std::get<0>(col);
+  auto& cola = std::get<0>(col);
     
-    Table<Column<aname, Head> , Tail...> t;
-    Column<aname, Head> new_head;
-    new_head.column = cola.column;
-    std::get<index>(t.columns) = new_head;
-    return JoinC(tt...);
+  //    Table<Column<aname, Head> , Tail...> t;
+  Column<aname, Head> new_head_column;
+  new_head_column.column = cola.column;
+  //std::get<index>(t.columns) = new_head;
+  return add_column(new_head_column, tt...);
     
 
   //  constexpr static int  counter = counter + 1;
@@ -46,7 +56,7 @@ int main(void){
 
     table2.insert_row( std::string("kirill_") + std::to_string(toascii(i + 64))) ;
   }
-  // auto table_join = Join(table1,table2);
+  //   auto table_join = JoinC1(table1,table2);
   
   // auto r = table_join.get_index<"id">(1);
   
