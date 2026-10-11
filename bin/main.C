@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include "../lib/rel_operator/rel_operator.hpp"
 #include "../lib/lattice_storage/lattice_storage.hpp"
 #include <iostream>
 #include <vector>
@@ -28,7 +27,6 @@ int main(int argc, char** argv){
   
   id_column.print_name(); // Выведет: Column name: id
   Table<Column<"name", std::string>, Column<"id", int>> table;
-  Filter(&storage, 3);
   dump(&storage);
   table.insert_row("kirill", 1);
   auto& name_col = std::get<0>(table.columns);
