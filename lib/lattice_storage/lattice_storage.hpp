@@ -4,8 +4,7 @@
 #include <vector>
 #include <optional>
 #include <assert.h>
-using std::vector;
-using std::find;
+
 template<std::size_t N>
 struct FixedString {
   char data[N]{}; // Открытый массив символов
@@ -107,21 +106,6 @@ struct Table {
     }
     
       
-  }
-  template<FixedString TargetName, typename  T>
-  vector<size_t>  get_indices(const T& val){
-    constexpr auto value = find_column_index<TargetName, 0, Cols...>::value;
-    const auto& column = std::get<value>(columns);
-    const auto& col = column.column;
-    //    auto it = std::find(col.begin(), col.end(), val);
-    vector<size_t> indices;
-    auto it = col.begin();
-    while ((it = find(it,col.end(),val))!= col.end()) {
-      indices.push_back(std::distance(col.begin(),it));
-      it++;
-    }
-    return indices;
-
   }
     
    
