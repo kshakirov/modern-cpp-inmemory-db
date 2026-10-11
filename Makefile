@@ -15,3 +15,6 @@ test_template:
 
 test_cartesian:
 	$(GCC) test/test_cartesian_product_2.C   -o test/test_cartesian_product_2 $(FLAGS)	
+
+test_select_indices:
+	$(GCC) test/test_select_indices.C -o test/test_select_indices $(FLAGS)
