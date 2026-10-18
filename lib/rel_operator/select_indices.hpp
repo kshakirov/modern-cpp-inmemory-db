@@ -29,15 +29,15 @@ RowIndices select_indices(const Table<Cols...>& table, const T& val){
 }
 
 template<typename... Cols>
-void materialize(const Table<Cols...>& original_table, Table<Cols...> result_table, RowIndices indices){
+void materialize(const Table<Cols...>& original_table, Table<Cols...>& result_table, const RowIndices& indices){
   std::cout<< "Started"<< std::endl;
 
   // C++26 (GCC 16)
   template for ( const auto i : std::views::iota(0uz, std::tuple_size_v<decltype(original_table.columns)>)) {
     // i — compile-time индекс
      std::cout << i << std::endl;
-     auto old_col = std::get<i>(original_table.columns);
-     auto new_col = std::get<i>(result_table.columns);
+     const auto& old_col = std::get<i>(original_table.columns);
+     auto& new_col = std::get<i>(result_table.columns);
      for (auto idx : indices){
        std::cout << "idx " << idx << std::endl;
        auto val = old_col.column.at(idx);
@@ -45,7 +45,7 @@ void materialize(const Table<Cols...>& original_table, Table<Cols...> result_tab
 
      }
 }
- 
+
 }
 									   
 
