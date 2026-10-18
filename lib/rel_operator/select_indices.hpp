@@ -26,3 +26,10 @@ RowIndices select_indices(const Table<Cols...>& table, const T& val){
   return indices;
 
 }
+
+template<FixedString TargetName, typename... Cols, typename T>
+void select(const Table<Cols...>& table , const T& val){
+  auto indices = select_indices<TargetName>(table, val);
+  Table<Cols...> table2;
+  std::cout<<"Here we go bro" << std::endl;
+}

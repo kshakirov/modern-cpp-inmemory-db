@@ -24,4 +24,6 @@ int main() {
   // TODO: no match    -> []
   // TODO: one match   -> [1]
   // TODO: many matches -> [0, 2]
+
+  select<"id">(table, 1);
 }
