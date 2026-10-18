@@ -1,6 +1,6 @@
-GCC=g++
-FLAGS=-std=c++23 
-#FLAGS=-std=c++23 -fmodules-ts 
+GCC=g++-16
+FLAGS=-std=c++26
+#FLAGS=-std=c++26 -fmodules-ts
 
 all:
 
