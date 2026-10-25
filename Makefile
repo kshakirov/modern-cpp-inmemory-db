@@ -18,3 +18,5 @@ test_cartesian:
 
 test_select_indices:
 	$(GCC) test/test_select_indices.C -o test/test_select_indices $(FLAGS)
+test_projection:
+	$(GCC) test/test_projection.C -o test/test_projection $(FLAGS)

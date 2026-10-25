@@ -1,3 +1,4 @@
+#pragma once
 #include "../all_types.hpp"
 #include <algorithm>
 #include <tuple>
@@ -20,10 +21,14 @@ struct FixedString {
 template<FixedString Name, typename T>
 struct Column {
   std::vector<T > column;
-  void print_name() {
+  void print_name()const {
     // Мы можем напечатать имя, потому что байты сохранены в массиве!
     std::cout << "Column name: " << Name.data << std::endl;
   };
+  std::string columnName() const{
+    return Name.data;
+  }
+  
   int  insert (T val){
     column.push_back(val);
     return  1;
