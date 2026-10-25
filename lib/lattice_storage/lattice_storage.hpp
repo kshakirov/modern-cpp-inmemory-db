@@ -25,7 +25,7 @@ struct Column {
     // Мы можем напечатать имя, потому что байты сохранены в массиве!
     std::cout << "Column name: " << Name.data << std::endl;
   };
-  std::string columnName() const{
+  static constexpr std::string_view columnName() {
     return Name.data;
   }
   
