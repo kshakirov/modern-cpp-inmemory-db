@@ -5,29 +5,6 @@
 using std::cout;
 using std::endl;
 
-template <typename ...ColsA, typename ...ColsB>
-Table<ColsA...> project(Table<ColsA...> projection, Table<ColsB...> source){
-  Table<ColsA...> result;
-   template for (const auto i : std::views::iota(0uz, std::tuple_size_v<decltype(projection.columns)>)) {
-      const auto& projection_col = std::get<i>(projection.columns);
-      
-      template for (const auto y : std::views::iota(0uz, std::tuple_size_v<decltype(source.columns)>)) {
-	//cout<< y << endl;
-	      const auto& source_col = std::get<y>(source.columns); 
-	      if constexpr( source_col.columnName() == projection_col.columnName()){
-		//cout << "the columns are equal " <<  source_col.columnName() << endl;
-		//later		std::is_same<source_col, projection_col>;
-		auto cols = source_col.column;
-		auto& result_col = std::get<i>(result.columns);
-		result_col.column = source_col.column;
-	      }
-      }
-      
-   }
-   return result;
-}
-
-
 int main(void){
   cout << "Working with projections" << endl;
   Table<Column<"id", int>, Column<"name", std::string>, Column<"age", int>> source_table;
@@ -39,6 +16,12 @@ int main(void){
   auto projection_result  = project(projection_table, source_table);
   assert(std::get<0>(projection_result.columns).columnName() == "id");
   assert(std::get<0>(projection_result.columns).column.size() == std::get<0>(source_table.columns).column.size());
+  assert((std::get<0>(projection_result.columns).column == std::vector<int>{1, 2}));
+
+  Table<Column<"age", int>, Column<"name", std::string>> reordered_schema;
+  auto reordered_result = project(reordered_schema, source_table);
+  assert((std::get<0>(reordered_result.columns).column == std::vector<int>{25, 26}
+       && std::get<1>(reordered_result.columns).column == std::vector<std::string>{"Kirill", "Jenia"}));
   
   
   
