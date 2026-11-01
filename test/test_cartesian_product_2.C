@@ -18,7 +18,20 @@ auto join_two_tables(const Table<LeftCols...>& t1,
                      const Table<RightCols...>& t2) {
     Table<LeftCols..., RightCols...> result;
     // Склеиваем кортежи с колонками в новый tuple
-    result.columns = std::tuple_cat(t1.columns, t2.columns);
+    cout << "Joining columns" << endl;
+    //lresult.columns = std::tuple_cat(t1.columns, t2.columns);
+    auto& col1 =(std::get<0>(result.columns)).column;
+    auto& col2 =(std::get<1>(result.columns)).column;
+    for (auto v : (std::get<0>(t1.columns)).column){
+      cout <<"External cycle " <<v << endl;
+
+      for (auto w : (std::get<0>(t2.columns)).column){
+	cout <<"Internal cycle " << w << endl;
+	col1.push_back(v);
+	col2.push_back(w);
+      }
+    }
+	
     return result;
 }
 
@@ -43,64 +56,24 @@ auto JoinC1(HeadTable head, TailTables... tail) {
 }
 
 
-
-
-// template <typename ...Cols, typename Head, FixedString aname>
-// Table<Cols... > add_column(Column<aname, Head> column, Table<Cols...> table){
-
-//   constexpr std::size_t tuple_size =    std::tuple_size_v<decltype(table.columns)>;
-//   std::get<tuple_size>(table.columns - 1) = column;
-//   return table;
-
-// };
-
-// template<typename ...Cols, typename  Head, typename  ...Tail, FixedString aname, int index>
-
-// Table<Column<aname, Head> , Tail...> JoinC1(Table<Column<aname, Head>>table, Tail... tt  ){
-//   auto& col = table.columns;
-//   auto& cola = std::get<0>(col);
-    
-//   //    Table<Column<aname, Head> , Tail...> t;
-//   Column<aname, Head> new_head_column;
-//   new_head_column.column = cola.column;
-//   //std::get<index>(t.columns) = new_head;
-//   return add_column(new_head_column, JoinC1(tt...));
-    
-
-//   //  constexpr static int  counter = counter + 1;
-// }
-
-// template <typename>
-// Table<> JoinC1(){
-//   Table<> table;
-//   return table;
-  
-// }
-
-
-
 int main(void){
   cout<<"Trying to get Cartesian product to work" <<endl;
   Table<Column<"id",int>> table1 ;
-  Table<Column<"name", std::string>>  table2;
+  Table<Column<"name", std::string>, Column<"age", int>>  table2;
   table1.insert_row(1);
+  table1.insert_row(2);
   for   (auto i : std::views::iota(0, 5)){
 
-    table2.insert_row( std::string("kirill_") + std::to_string(toascii(i + 64))) ;
+    table2.insert_row( std::string("kirill_") + std::to_string(toascii(i + 64)), i) ;
   }
    auto table_join = JoinC1(table1,table2);
-  
-  // auto r = table_join.get_index<"id">(1);
-  
-  // cout<< " result is " << r << " " <<endl;
-  // assert(r==0);
-
-  // auto& col_id = std::get<0>(table_join.columns);
-  // auto& col_name = std::get<1>(table_join.columns);
-
-  // assert(col_id.column.size()==5);
-  // assert(col_name.column.size()==5);
-  
-  
-  //  Join(Table<Column<"namea", A>>, Table<Column<"nameb", B>>)
+   assert(std::tuple_size_v<decltype(table1.columns)> ==1);
+   assert(std::tuple_size_v<decltype(table2.columns)> ==2);
+   assert(std::get<0>(table1.columns).column.size()==2);
+   assert(std::get<0>(table2.columns).column.size()==5);
+   assert(std::get<1>(table2.columns).column.size()==5);
+   assert(std::tuple_size_v<decltype(table_join.columns)> ==3);
+   assert(std::get<0>(table_join.columns).column.size()==10);
+   assert(std::get<1>(table_join.columns).column.size()==10);
+   assert(std::get<2>(table_join.columns).column.size()==10);
 }
