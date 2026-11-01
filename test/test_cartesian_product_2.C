@@ -92,4 +92,18 @@ int main(void){
   assert(std::get<0>(table_join.columns).column.size()==10);
   assert(std::get<1>(table_join.columns).column.size()==10);
   assert(std::get<2>(table_join.columns).column.size()==10);
+
+  // Two columns per side; duplicate rows must retain their multiplicity.
+  Table<Column<"key", int>, Column<"label", string>> left;
+  Table<Column<"score", int>, Column<"tag", string>> right;
+  left.insert_row(1, "A");
+  left.insert_row(2, "B");
+  right.insert_row(7, "X");
+  right.insert_row(7, "X");
+  right.insert_row(9, "Y");
+  const auto product = JoinC1(left, right);
+  assert((std::get<0>(product.columns).column == std::vector<int>{1, 1, 1, 2, 2, 2}));
+  assert((std::get<1>(product.columns).column == std::vector<string>{"A", "A", "A", "B", "B", "B"}));
+  assert((std::get<2>(product.columns).column == std::vector<int>{7, 7, 9, 7, 7, 9}));
+  assert((std::get<3>(product.columns).column == std::vector<string>{"X", "X", "Y", "X", "X", "Y"}));
 }
