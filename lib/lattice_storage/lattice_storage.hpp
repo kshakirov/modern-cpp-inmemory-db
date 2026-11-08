@@ -112,7 +112,9 @@ struct Table {
     
       
   }
-    
+  const size_t size(){
+    return std::tuple_size_v<decltype(columns)>;
+  }
    
     
    
