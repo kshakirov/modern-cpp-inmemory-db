@@ -23,16 +23,10 @@ auto     union_tables(const Table<LeftCols...>& l_table, const Table<RightCols..
     exit(1);
   }
   template for (const auto i : std::views::iota(0uz,l_size)){
-    const bool name_matches = false;
-    const auto l_name = std::get<i>(l_table.columns).columnName();
-    template for (const auto y : std::views::iota(0uz,l_size)){
-      const auto r_name = std::get<y>(r_table.columns).columnName();
-      cout << "l name is " << l_name << " r name is " << r_name << endl;
-      if constexpr (l_name == r_name) {
-	name_matches = true;
-	break;
-      }
-     }
+
+    constexpr auto l_name = std::get<i>(l_table.columns).columnName();
+    constexpr bool name_matches = ((RightCols::columnName() == l_name) || ...);
+
     if constexpr (!name_matches){
       cout<<"Table columns names do not  match, quitting " <<endl;
     }
