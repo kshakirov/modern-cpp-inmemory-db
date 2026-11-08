@@ -40,9 +40,16 @@ auto     union_tables(const Table<LeftCols...>& l_table, const Table<RightCols..
    }
 
   template for (const auto i : std::views::iota(0uz, l_size)){
+    
     auto& v1 = std::get<i>(result.columns).column;
     auto v2  = std::get<i>(r_table.columns).column;
-    v1.insert(v1.begin(),v2.begin(),v2.end());
+    using V1 = std::remove_reference_t<decltype(v1)>;
+    using V2 = std::remove_reference_t<decltype(v2)>;
+    if constexpr (std::is_same_v<typename V1::value_type, typename V2::value_type>) {
+      v1.insert(v1.begin(),v2.begin(),v2.end());
+    // типы совпадают
+    }
+
    }
     
   return result;
