@@ -28,7 +28,14 @@ auto     union_tables(const Table<LeftCols...>& l_table, const Table<RightCols..
     template for (const auto y : std::views::iota(0uz,l_size)){
       const auto r_name = std::get<y>(r_table.columns).columnName();
       cout << "l name is " << l_name << " r name is " << r_name << endl;
+      if constexpr (l_name == r_name) {
+	name_matches = true;
+	break;
+      }
      }
+    if constexpr (!name_matches){
+      cout<<"Table columns names do not  match, quitting " <<endl;
+    }
   }
 
   Table<LeftCols...> result ;
