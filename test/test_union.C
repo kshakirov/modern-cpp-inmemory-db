@@ -18,18 +18,22 @@ auto     union_tables(const Table<LeftCols...>& l_table, const Table<RightCols..
 
   const auto l_size = std::tuple_size_v<decltype(l_table.columns)>;
   const auto  r_size = std::tuple_size_v<decltype(r_table.columns)>;
-  if constexpr (l_size != r_size){
+  if constexpr (l_size == r_size){
     cout<<"Table columns numbers do not  match, quitting " <<endl;
-    exit(1);
+    //    exit(1);
+  }else {
+    static_assert(false, "columns numbers  must match");
   }
   template for (const auto i : std::views::iota(0uz,l_size)){
 
     constexpr auto l_name = std::get<i>(l_table.columns).columnName();
     constexpr bool name_matches = ((RightCols::columnName() == l_name) || ...);
 
-    if constexpr (!name_matches){
-      cout<<"Table columns names do not  match, quitting " <<endl;
-      exit(1);
+    if constexpr (name_matches){
+      cout<<"Table columns names   match, quitting " <<endl;
+      //exit(1);
+    }else{
+      static_assert(false, "both columns must be of the same type");
     }
   }
 
@@ -48,6 +52,8 @@ auto     union_tables(const Table<LeftCols...>& l_table, const Table<RightCols..
     if constexpr (std::is_same_v<typename V1::value_type, typename V2::value_type>) {
       v1.insert(v1.begin(),v2.begin(),v2.end());
     // типы совпадают
+    }else{
+      static_assert(false, "both columns must be of the same type");
     }
 
    }
@@ -76,16 +82,23 @@ int main(void){
   cout << "Working with union" <<endl;
   Table<Column<"name", std::string>, Column<"id", int>> l_table;
   Table<Column<"name", std::string>, Column<"id", int>> r_table;
-  Table<Column<"name", std::string>, Column<"id", int>, Column<"age", int>> wrong_table;
+  Table<Column<"name", std::string>, Column<"id", int>, Column<"age", int>> wrong_table_size;
+  Table<Column<"name", std::string>, Column<"id", std::string>> wrong_table_type;
   l_table.insert_row("Jenia", 1);
   l_table.insert_row("Kirill", 2);
   r_table.insert_row("Stepanov", 3);
   r_table.insert_row("Straustroup", 4);
-
+  wrong_table_size.insert_row("Petya",5,27);
+  wrong_table_type.insert_row("no name", "6");
+  
   //  UnionU1(l_table,wrong_table);
   auto united_tables_of_me = UnionU1(l_table,r_table);
 
   assert(united_tables_of_me.size() == 2);
   cout << "size "<<  std::get<0>(united_tables_of_me.columns).column.size() << endl;
   assert(std::get<0>(united_tables_of_me.columns).column.size()==4);
+
+
+  //   auto wrongly_united_tables = UnionU1(l_table, wrong_table_size);
+  //  auto wrongly_united_tables = UnionU1(l_table, wrong_table_type);
 }

@@ -23,3 +23,6 @@ test_projection:
 
 test_union:
 	$(GCC) test/test_union.C -o test/test_union $(FLAGS)
+
+test_difference:
+	$(GCC) test/test_difference.C -o test/test_difference $(FLAGS)
