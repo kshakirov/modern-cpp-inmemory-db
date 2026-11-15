@@ -2,7 +2,7 @@
 #include <tuple>
 #include <ranges>
 #include "../lib/lattice_storage/lattice_storage.hpp"
-
+#include <set>
 
 using std::cout;
 using std::endl;
@@ -43,9 +43,39 @@ auto     union_tables(const Table<LeftCols...>& l_table, const Table<RightCols..
     std::get<i>(result.columns).column = std::get<i>(l_table.columns).column;
    }
 
+  for (int y = 0; y < std::get<0>(result.columns).column.size();y ++){
+    std::vector<std::set<size_t>> indices;
+    template for (const auto i : std::views::iota(0uz, l_size)){
+      auto& v1 = std::get<i>(result.columns).column;
+      auto& v2  = std::get<i>(r_table.columns).column;
+      auto value = v1.at(y);
+      std::set<size_t> ixs;
+      for (size_t i = 0; i < v2.size(); ++i) {
+	if (v2[i] == value) ixs.insert(i);
+      }
+      indices.push_back(ixs);
+    }
+
+    auto& s_i = indices.at(0);
+    for (int k = 1; k < indices.size(); k++){
+      
+      std::set_intersection(indices.at(k).begin(), indices.at(k).end(),
+			    s_i.begin(), s_i.end(),
+			    std::inserter(s_i, s_i.begin()));
+    }
+    if(s_i.size() > 0){
+      std::cout << "Now we have indices"<< std::endl;
+    }
+    else{ std::cout << "we dont  have indices"<< std::endl;
+    }
+
+  }
+
+  
   template for (const auto i : std::views::iota(0uz, l_size)){
     
     auto& v1 = std::get<i>(result.columns).column;
+    
     auto& v2  = std::get<i>(r_table.columns).column;
     using V1 = std::remove_reference_t<decltype(v1)>;
     using V2 = std::remove_reference_t<decltype(v2)>;
@@ -86,14 +116,14 @@ int main(void){
   Table<Column<"name", std::string>, Column<"id", std::string>> wrong_table_type;
   l_table.insert_row("Jenia", 1);
   l_table.insert_row("Kirill", 2);
-  r_table.insert_row("Stepanov", 3);
+  r_table.insert_row("Kirill", 2);
   r_table.insert_row("Straustroup", 4);
   wrong_table_size.insert_row("Petya",5,27);
   wrong_table_type.insert_row("no name", "6");
   
   //  DifferenceD1(l_table,wrong_table);
   auto united_tables_of_me = DifferenceD1(l_table,r_table);
-
+  
   assert(united_tables_of_me.size() == 2);
   cout << "size "<<  std::get<0>(united_tables_of_me.columns).column.size() << endl;
   assert(std::get<0>(united_tables_of_me.columns).column.size()==4);
